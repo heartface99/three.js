@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js webgl - rendering examples</title>
+		<title>THREE.js first animation</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -15,10 +15,9 @@
 
 	<body>
 		<div id="container"></div>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 		<script src="../build/three.js"></script>
 		<script src="js/Detector.js"></script>
+    <script src="js/loaders/OBJLoader.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
@@ -38,12 +37,12 @@
 
 			var mouseX = 0, mouseY = 0;
 
-			var NEAR = 1.0, FAR = 350.0;
+			var NEAR = 1.0, FAR = 1000.0;
 			var VIEW_ANGLE = 45;
 
 			var renderer, camera, scene, stats, clock, mixer;
 
-			var numLights = 50;
+			var numLights = 15;
 			var lights = [];
 			var transparentObjects = [];
 
@@ -74,40 +73,42 @@
 			}
 
 			function initKnight() {
+       var loader = new THREE.OBJLoader();
 
-				var loader = new THREE.JSONLoader();
+        // load a resource
+        loader.load('models/skinned/Bigmax_White_OBJ.obj',
+        	// called when resource is loaded
 
-				loader.load( "models/skinned/knight.json", function( geometry, materials ) {
-					console.log("materials are: ", materials);
-					console.log("geo is : ", geometry)
-					var material = materials[ 0 ];
-					material.emissive.set( 0x101000 );
-					material.skinning = true;
-					material.morphTargets = true;
+        	function ( object ) {
+            console.log(object);
+            object.position.y = -10;
 
-					var mesh = new THREE.SkinnedMesh( geometry, material );
-					mesh.position.y = -47;
-					// size of the figure
-					mesh.scale.multiplyScalar( 5 );
+            	var mesh = new THREE.SkinnedMesh( object );
+              mesh.geometry.scale.set(0.7,0.7,1)
 
-					mixer = new THREE.AnimationMixer( mesh );
+            	mixer = new THREE.AnimationMixer( mesh );
+            	for ( var i = 0; i < mesh.geometry.animation; i ++ ) {
 
-					for ( var i = 0; i < mesh.geometry.animations.length; i ++ ) {
+            		var action = mixer.clipAction( mesh.geometry.animations[ i ] );
+            		action.play();
+            }
+        		scene.add( object );
+            ready = true;
 
-						var action = mixer.clipAction( mesh.geometry.animations[ i ] );
+        	},
+        	// called when loading is in progresses
+        	function ( xhr ) {
 
-						if ( i === 1 ) action.timeScale = 0.25;
+        		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 
-						action.play();
+        	},
+        	// called when loading has errors
+        	function ( error ) {
 
-					}
+        		console.log( 'An error happened' );
 
-					scene.add( mesh );
-
-					ready = true;
-
-				} );
-
+        	}
+        );
 			}
 
 			function initLights() {
@@ -115,13 +116,12 @@
 				var distance = 20;
 
 				var c = new THREE.Vector3();
-				var geometry = new THREE.SphereGeometry(2, 32, 32, 0, Math.PI * 2, 0, Math.PI * 2 );
+				var geometry = new THREE.SphereGeometry(1.5, 32, 32, 0, Math.PI * 2, 0, Math.PI * 2 );
 
 				for ( var i = 0; i < numLights; i ++ ) {
 
 					var light = new THREE.PointLight( 0xffffff, 2.0, distance );
-					c.set(Math.random(), Math.random(), Math.random() +10).normalize();
-					light.color.setRGB( c.x, c.y, c.z );
+					light.color.setRGB( 0, 0, 1);
 					scene.add( light );
 					lights.push( light );
 
@@ -181,7 +181,7 @@
 				for ( var i = 0, il = lights.length; i < il; i ++ ) {
 
 					var light = lights[ i ];
-					var x = Math.sin( time + i * 7.0 ) * 45;
+					var x = Math.sin( time + i * 7.0 ) * 30;
 					var y = Math.cos( time + i * 5.0 ) * 45 + 20;
 					var z = Math.cos( time + i * 3.0 ) * 45;
 					light.position.set( x, y, z );
@@ -193,7 +193,7 @@
 			function render() {
 
 				camera.position.x += ( - mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+        camera.position.y += ( - mouseY - camera.position.y ) * .05;
 				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
