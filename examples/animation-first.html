@@ -76,22 +76,21 @@
        var loader = new THREE.OBJLoader();
 
         // load a resource
-        loader.load('models/skinned/Bigmax_White_OBJ.obj',
+        loader.load('models/skinned/lotus.obj',
         	// called when resource is loaded
 
         	function ( object ) {
-            console.log("object", object);
-            object.position.y = -20;
+            object.position.y = -30;
 
-          	var mesh = new THREE.SkinnedMesh( object );
-            mesh.geometry.scale.set(0.7,0.7,1);
-            console.log("material", object.materialLibraries);
-            console.log("material?", mesh.material.color );
-            mesh.material.color.setRGB(255,255,255);
-            console.log("material?", mesh.material.color );
+          	var mesh = new THREE.Mesh( object );
+            mesh.geometry.scale.set(13,13,1);
+						object.traverse( function ( child ) {
+               if ( child instanceof THREE.Mesh ) {
+                    	child.material.color.setRGB(255,255,255);
+                   }
+            } );
 
           	mixer = new THREE.AnimationMixer( mesh );
-            console.log("geomoetry of mesh", mesh.geometry);
 
             // 	for ( var i = 0; i < mesh.geometry.animation; i ++ ) {
             //     console.log("here");
@@ -119,19 +118,19 @@
 
 			function initLights() {
 
-				var distance = 20;
+				var distance = 45;
 
 				var c = new THREE.Vector3();
-				var geometry = new THREE.SphereGeometry(1.5, 32, 32, 0, Math.PI * 2, 0, Math.PI * 2 );
+				var geometry = new THREE.SphereGeometry(1, 32, 32, 0, Math.PI * 2, 0, Math.PI * 2 );
 
 				for ( var i = 0; i < numLights; i ++ ) {
 
 					var light = new THREE.PointLight( 0xffffff, 2.0, distance );
-					light.color.setRGB( 0, 0, 1);
+					light.color.setRGB(0,0,1);
 					scene.add( light );
 					lights.push( light );
 
-					var material = new THREE.MeshBasicMaterial( { color: 0x0000FF } );
+					var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 					var emitter = new THREE.Mesh( geometry, material );
 					light.add( emitter );
 
