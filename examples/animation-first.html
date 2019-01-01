@@ -64,7 +64,7 @@
 				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
-				initKnight();
+				initBaymax();
 				initLights();
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -72,7 +72,7 @@
 
 			}
 
-			function initKnight() {
+			function initBaymax() {
        var loader = new THREE.OBJLoader();
 
         // load a resource
@@ -80,18 +80,24 @@
         	// called when resource is loaded
 
         	function ( object ) {
-            console.log(object);
-            object.position.y = -10;
+            console.log("object", object);
+            object.position.y = -20;
 
-            	var mesh = new THREE.SkinnedMesh( object );
-              mesh.geometry.scale.set(0.7,0.7,1)
+          	var mesh = new THREE.SkinnedMesh( object );
+            mesh.geometry.scale.set(0.7,0.7,1);
+            console.log("material", object.materialLibraries);
+            console.log("material?", mesh.material.color );
+            mesh.material.color.setRGB(255,255,255);
+            console.log("material?", mesh.material.color );
 
-            	mixer = new THREE.AnimationMixer( mesh );
-            	for ( var i = 0; i < mesh.geometry.animation; i ++ ) {
+          	mixer = new THREE.AnimationMixer( mesh );
+            console.log("geomoetry of mesh", mesh.geometry);
 
-            		var action = mixer.clipAction( mesh.geometry.animations[ i ] );
-            		action.play();
-            }
+            // 	for ( var i = 0; i < mesh.geometry.animation; i ++ ) {
+            //     console.log("here");
+            // 		var action = mixer.clipAction( mesh.geometry.animations[ i ] );
+            // 		action.play();
+            // }
         		scene.add( object );
             ready = true;
 
